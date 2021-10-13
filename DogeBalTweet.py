@@ -29,7 +29,7 @@ def getDogeBal():
     #print(data_json)
     k = str(data_json)
     now = datetime.now()
-    return "Tyler's Doge Balance: " + k[76:89] + '\n' + str(now)
+    return "Tyler's Doge Balance: " + k[76:89] + '\n' + str(now) + " @dogecoin"
 
 def tweetDogeBal():
     twitter = Twython(
