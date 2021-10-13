@@ -28,7 +28,8 @@ def getDogeBal():
     data_json = json.loads(response.read())
     #print(data_json)
     k = str(data_json)
-    return "Tyler's Doge Balance: " + k[76:89]
+    now = datetime.now()
+    return "Tyler's Doge Balance: " + k[76:89] + '\n' + str(now)
 
 def tweetDogeBal():
     twitter = Twython(
