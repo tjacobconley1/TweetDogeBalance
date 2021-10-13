@@ -27,7 +27,8 @@ def getDogeBal():
     # from url in data
     data_json = json.loads(response.read())
     #print(data_json)
-    return data_json
+    k = str(data_json)
+    return "Tyler's Doge Balance: " + k[76:89]
 
 def tweetDogeBal():
     twitter = Twython(
