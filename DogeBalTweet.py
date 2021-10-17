@@ -7,12 +7,15 @@
 from urllib.request import urlopen
 import json
 from twython import Twython
+from datetime import datetime
+
 
 #KEYS FROM THE TWITTER DEV PORTAL
 consumer_key        = 'ABCDEFGHIJKLKMNOPQRSTUVWXYZ'
 consumer_secret     = '1234567890ABCDEFGHIJKLMNOPQRSTUVXYZ'
 access_token        = 'ZYXWVUTSRQPONMLKJIHFEDCBA'
 access_token_secret = '0987654321ZYXWVUTSRQPONMLKJIHFEDCBA'
+
 
 
 
@@ -28,19 +31,38 @@ def getDogeBal():
     data_json = json.loads(response.read())
     #print(data_json)
     k = str(data_json)
-    now = datetime.now()
-    return "Tyler's Doge Balance: " + k[76:89] + '\n' + str(now) + " @dogecoin"
+    return "Tyler's Doge Balance: " + k[76:89] 
+
+def getBlockCount():
+    blockCountUrl = 'https://dogechain.info/chain/Dogecoin/q/getblockcount'
+    blockCountResponse = urlopen(blockCountUrl)
+    data_json = json.loads(blockCountResponse.read())
+    str_data_json = str(data_json)
+    return "\n" + "Block Count: " + str_data_json
+
+def totalMined():
+    totalMinedUrl = "http://dogechain.info/chain/Dogecoin/q/totalbc"
+    totalMinedResponse = urlopen(totalMinedUrl)
+    data_json = json.loads(totalMinedResponse.read())
+    str_data_json = str(data_json)
+    return "\n" + "Total Amount of Doge Mined: " + str_data_json
+
 
 def tweetDogeBal():
     twitter = Twython(
     consumer_key, consumer_secret, access_token, access_token_secret)
-    message = str(getDogeBal())
+    now = str(datetime.now()) + "\n"
+    message = now + getDogeBal() + getBlockCount() + totalMined() + "\n @dogecoin"
     twitter.update_status(status=message)
     print("Tweeted: %s" % message)
 
-getDogeBal()
-tweetDogeBal()
+def tweetBlockCount():
+    twitter = Twython(
+    consumer_key, consumer_secret, access_token, access_token_secret)
+    count = getBlockCount()
+    twitter.update_status(status=count)
 
+tweetDogeBal()
 
 
 
