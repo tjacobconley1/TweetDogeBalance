@@ -1,7 +1,6 @@
 
 
 # TEST NET
-# https://block.io/api/v2/get_balance/?api_key=c562-fd68-d1b9-b1a5
 
 # import urllib library
 from urllib.request import urlopen
@@ -11,6 +10,10 @@ from datetime import datetime
 
 
 #KEYS FROM THE TWITTER DEV PORTAL
+# These Keys should not be coded explicitly like this
+# ideally they should be stored in a separate encrypted file
+# and there should be a decryption function within this 
+# python script in order to read them in
 consumer_key        = 'ABCDEFGHIJKLKMNOPQRSTUVWXYZ'
 consumer_secret     = '1234567890ABCDEFGHIJKLMNOPQRSTUVXYZ'
 access_token        = 'ZYXWVUTSRQPONMLKJIHFEDCBA'
