@@ -31,7 +31,13 @@ access_token_secret = '0987654321ZYXWVUTSRQPONMLKJIHFEDCBA'
 
 
 def getDogeBal():
-      
+     """
+    This function pulls in my current Testnet
+    Doge balance as a json file, casts it as 
+    a String and returns a String containing
+    my current Balance 
+    
+    """
     url = "https://block.io/api/v2/get_balance/?api_key=c562-fd68-d1b9-b1a5"
     
     #store the response of URL
@@ -45,6 +51,10 @@ def getDogeBal():
     return "Tyler's Doge Balance: " + k[76:89] 
 
 def getBlockCount():
+    """
+    This function returns the total Doge 
+    blockcount as a String
+    """
     blockCountUrl = 'https://dogechain.info/chain/Dogecoin/q/getblockcount'
     blockCountResponse = urlopen(blockCountUrl)
     data_json = json.loads(blockCountResponse.read())
@@ -52,6 +62,10 @@ def getBlockCount():
     return "\n" + "Block Count: " + str_data_json
 
 def totalMined():
+    """
+    This function returns the total amount of 
+    Dofe mined as a String
+    """
     totalMinedUrl = "http://dogechain.info/chain/Dogecoin/q/totalbc"
     totalMinedResponse = urlopen(totalMinedUrl)
     data_json = json.loads(totalMinedResponse.read())
@@ -60,6 +74,11 @@ def totalMined():
 
 
 def tweetDogeBal():
+    """
+    This function is used to tweet my Testnet
+    Doge balance as well as some Doge chain 
+    statistics 
+    """  
     twitter = Twython(
     consumer_key, consumer_secret, access_token, access_token_secret)
     now = str(datetime.now()) + "\n"
@@ -72,7 +91,8 @@ def tweetBlockCount():
     consumer_key, consumer_secret, access_token, access_token_secret)
     count = getBlockCount()
     twitter.update_status(status=count)
-     
+
+"""
 def atMeTweets():
     auth = tw.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -103,8 +123,15 @@ def atMeTweets():
     message = base_url + str(T[0]) + ' ' + "good night to everyone except for the people its not night for" 
     print(message)
     #twitter.update_status(status=message)
-        
+"""
+
+
 def graphGregAndTyler():
+    """
+    This function tweets a graph comparing the 
+    total number of tweets Greg and Tyler have
+    made in the past 24hrs 
+    """
     # authenticate 
     auth = tw.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -154,6 +181,11 @@ def graphGregAndTyler():
     twitter.update_status(status=tweet_text, media_ids=[response['media_id']])
 
 def get_past_24hour_tweets(username):
+    """
+    This function is used to return the total number
+    of tweets created by a certain user during the
+    past 24 hour period
+    """
     # authenticate 
     auth = tw.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -171,6 +203,37 @@ def get_past_24hour_tweets(username):
             Tlist.append(t.text)
     #print(len(Tlist))
     return len(Tlist)
+
+
+def findLastMorningTweet():
+    """ 
+    This function is used to find and return
+    the ID of the most recent morning tweet
+    that I have scheduled in Postman
+    """
+    # authenticate 
+    auth = tw.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tw.API(auth, wait_on_rate_limit=True)
+    
+    twitter = Twython(consumer_key, consumer_secret, access_token, access_token_secret)
+
+    endDate = datetime.today() 
+    startDate= endDate - timedelta(days = 1)
+    
+    search_words = "T_Conley1 good morning to everyone even the people its not morning for"
+    new_search = search_words + " -filter:retweets"
+    tweets = tw.Cursor(api.search_tweets, q=new_search, lang="en").items(1)
+
+    
+    lastID = 0
+    for t in tweets:
+        if t.text == "good morning to everyone even the people its not morning for":
+            if t.id > lastID:
+                lastID = t.id
+    print("Last Morning Tweet ID: ",lastID)
+    return lastID
+
 
 tweetDogeBal()
 
