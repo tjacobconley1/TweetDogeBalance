@@ -7,7 +7,15 @@ from urllib.request import urlopen
 import json
 from twython import Twython
 from datetime import datetime
+from datetime import date
+from datetime import timedelta
+import os
+import tweepy as tw
+import pandas as pd
+from block_io import BlockIo
+import matplotlib.pyplot as plt
 
+version = 2
 
 #KEYS FROM THE TWITTER DEV PORTAL
 # These Keys should not be coded explicitly like this
@@ -64,6 +72,105 @@ def tweetBlockCount():
     consumer_key, consumer_secret, access_token, access_token_secret)
     count = getBlockCount()
     twitter.update_status(status=count)
+     
+def atMeTweets():
+    auth = tw.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tw.API(auth, wait_on_rate_limit=True)
+    
+    base_url = "https://twitter.com/T_Conley1/status/"
+    
+    # Define the search term and the date_since date as variables
+    #search_words = "@greg16676935420"
+    search_words = "T_Conley1 good morning to everyone even the people its not morning for"
+    new_search = search_words + " -filter:retweets"    
+    date_since = "2021-10-24"
+    date = datetime.today()
+    # collect most recent morning tweet 
+    
+    tweets = tw.Cursor(api.search_tweets, q=new_search, lang="en", since=date_since).items(1)
+
+    
+    T = [str(tweet.id) + tweet.user.screen_name + ' '  + tweet.text  for tweet in tweets]    
+    for el in T:
+        print(el)
+        
+    # authenticate through Twython
+    twitter = Twython(consumer_key, 
+                      consumer_secret, 
+                      access_token, 
+                      access_token_secret)
+    message = base_url + str(T[0]) + ' ' + "good night to everyone except for the people its not night for" 
+    print(message)
+    #twitter.update_status(status=message)
+        
+def graphGregAndTyler():
+    # authenticate 
+    auth = tw.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tw.API(auth)
+        
+    startDate = date.today() 
+    endDate = startDate - timedelta(days = 1)
+    
+    search_tyler = "@T_Conley1"
+    search_greg = "@greg16676935420"
+    
+    total24HourTweetsTyler = get_past_24hour_tweets(search_tyler)
+    total24HourTweetsGreg = get_past_24hour_tweets(search_greg)
+    
+    print("Tyler Total Tweets(past 24hrs):", total24HourTweetsTyler)
+    print("Greg Total Tweets(past 24hrs):", total24HourTweetsGreg) 
+    
+    
+
+    fig = plt.figure()
+    plt.style.use('ggplot')
+    
+    x = ['@greg16676935420', '@T_Conley1']
+    y = [total24HourTweetsGreg, total24HourTweetsTyler]
+    
+    x_pos = [i for i, _ in enumerate(x)]
+    
+    plt.bar(x_pos, y, color='green')
+    plt.xlabel("PERSON", fontsize=20)
+    plt.ylabel("NUMBER OF TWEETS", fontsize=20)
+    plt.title("TWEETS IN PAST 24HRS")
+    plt.xticks(x_pos, x)
+
+    plt.show()
+    plt.savefig('chart.png')
+    
+    #Generate text tweet with media (image)
+    
+    twitter = Twython(
+    consumer_key, consumer_secret, access_token, access_token_secret)
+ 
+    photo = 'chart.png'
+    tweet_text = "tweets in past 24 hours from these two accounts from morning and night time @greg16676935420"
+    
+    photo = open('chart.png', 'rb')
+    response = twitter.upload_media(media=photo)
+    twitter.update_status(status=tweet_text, media_ids=[response['media_id']])
+
+def get_past_24hour_tweets(username):
+    # authenticate 
+    auth = tw.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tw.API(auth, wait_on_rate_limit=True)
+        
+    endDate = datetime.today() 
+    startDate= endDate - timedelta(days = 1)
+    
+    tweets = api.user_timeline(screen_name=username)
+    
+    Tlist =[]
+
+    for t in tweets:
+        if str(t.created_at)[0:19] > str(startDate)[0:19]:
+            Tlist.append(t.text)
+    #print(len(Tlist))
+    return len(Tlist)
 
 tweetDogeBal()
 
