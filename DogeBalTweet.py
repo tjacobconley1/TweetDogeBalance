@@ -1,8 +1,5 @@
 
 
-# TEST NET
-
-
 # import urllib library
 from urllib.request import urlopen
 import json
@@ -29,6 +26,11 @@ consumer_secret     = '1234567890ABCDEFGHIJKLMNOPQRSTUVXYZ'
 access_token        = 'ZYXWVUTSRQPONMLKJIHFEDCBA'
 access_token_secret = '0987654321ZYXWVUTSRQPONMLKJIHFEDCBA'
 
+secretPin = "abcdefghij123456"
+
+dogeApiKey = "a123-b456-c789-d000" 
+dogeAddress = "abcdefghijklmnopqrstuvwxyz012345678"
+
 
 def getDogeBal():
     """
@@ -49,6 +51,10 @@ def getDogeBal():
     #print(data_json)
     k = str(data_json)
     return "Tyler's Doge Balance: " + k[76:89] 
+
+def getEachAddressBal():
+    return block_io.get_my_addresses(page=1)
+
 
 def getBlockCount():
     """
@@ -104,7 +110,7 @@ def tweetDogeBal():
     """
     twitter = Twython(
     consumer_key, consumer_secret, access_token, access_token_secret)
-    now = str(datetime.now()) + "\n"
+    now = "Current Time: " + str(datetime.today())[0:19] + "\n"
     message = now + getDogeBal() + getBlockCount() + totalMined() + "\n @dogecoin"
     twitter.update_status(status=message)
     print("Tweeted: %s" % message)
@@ -235,22 +241,27 @@ def get_past_24hour_tweets(username):
     return len(Tlist)
 
 def quoteMorningTweet():
-    
-    # authenticate 
+    """
+    This function uses the helper function findLastMorningTweet()
+    to pull in the url of the most recent morning tweet that I've made
+    then quote tweets it with my nightime tweet phrase
+    """
+    # authenticate tweepy
     auth = tw.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tw.API(auth, wait_on_rate_limit=True)
-    
+    # authenticate Twython
     twitter = Twython(consumer_key, consumer_secret, access_token, access_token_secret)
 
     
-    # pull in the most recent Morning
-    # tweet ID
+    # This variable holds the URL of the most recent
+    # Morning Tweet 
+    # base Url: https://twitter.com/T_Conley1/status/
     lastMornID = findLastMorningTweet()
 
-    #tweets =
+    # perform quote tweet 
+    api.update_status("good night to everyone except for the people its not night for", attachment_url=lastMornID)
 
-    status = api.quote(lastMornID, tweet_mode='extended')
     
     
 
@@ -260,28 +271,38 @@ def findLastMorningTweet():
     the ID of the most recent morning tweet
     that I have scheduled in Postman
     """
-    # authenticate 
+    # authenticate tweepy
     auth = tw.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tw.API(auth, wait_on_rate_limit=True)
-    
+    # authenticate twython
     twitter = Twython(consumer_key, consumer_secret, access_token, access_token_secret)
 
+    # to calculate a 24 hour time period 
+    # in which to be searched 
     endDate = datetime.today() 
     startDate= endDate - timedelta(days = 1)
     
+    # specific string to search for
     search_words = "T_Conley1 good morning to everyone even the people its not morning for"
+    # filter retweet responses
     new_search = search_words + " -filter:retweets"
+    # perform search
     tweets = tw.Cursor(api.search_tweets, q=new_search, lang="en").items(1)
 
-    
+    # to store the tweet ID
     lastID = 0
+    # within search results find the specific tweet ID
+    # and assign it to a variable
     for t in tweets:
         if t.text == "good morning to everyone even the people its not morning for":
             if t.id > lastID:
                 lastID = t.id
-    print("Last Morning Tweet ID: ",lastID)
-    return lastID
+    
+    # print results
+    print("Last Morning Tweet ID: ", "https://twitter.com/T_Conley1/status/" + str(lastID))
+    # return complete URL of tweet 
+    return "https://twitter.com/T_Conley1/status/" + str(lastID)
     
             
     
@@ -419,8 +440,8 @@ def graphAndTweetDogeMentions():
   
 
 
-graphAndTweetDogeMentions()
-           
+#graphAndTweetDogeMentions()
+#print(getEachAddressBal())           
 #findLastMorningTweet()   
 #def tweetPhoto():  
 #prepareDogeTransaction(str(25), dogeAddress)
@@ -430,4 +451,10 @@ graphAndTweetDogeMentions()
 #get_past_24hour_tweets("@t_conley1")
 #graphGregAndTyler()
 #tweetDogeBal()
+quoteMorningTweet()
+
+
+
+
+
 
